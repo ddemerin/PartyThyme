@@ -18,7 +18,7 @@ namespace PartyThyme
             Console.WriteLine("***************************************");
             Console.WriteLine("What would you like to do?");
             Console.WriteLine("----------------------------------------"); 
-            Console.WriteLine("(VIEW), (PLANT), (REMOVE), or (WATER)?");
+            Console.WriteLine("(VIEW), (PLANT), (REMOVE), or (WATER)?\n Or would you like to (QUIT)?");
             Console.WriteLine("***************************************");
             var main = Console.ReadLine().ToUpper();
             if (main != "VIEW" && main != "PLANT" && main != "REMOVE" && main != "WATER")
@@ -49,23 +49,41 @@ namespace PartyThyme
                 // view plants by location summary
                 else if (view == "LOCATION")
                 {
+                    Console.WriteLine("\n***************************************");
+                    foreach (var plant in db.Plants.Distinct())
+                    {
+                        Console.WriteLine($"{plant.LocatedPlanted}");
+                    }
                     Console.WriteLine("What location would you like to view?");
                     var userLocation = Console.ReadLine();
                     var summary = db.Plants.Any(plant => plant.LocatedPlanted == userLocation);
-                    while (summary == true)
+                    Console.WriteLine("\n***************************************");
+                    while (!summary)
                     {
-                        var location = db.Plants.Where(plant => plant.LocatedPlanted == userLocation).ToList();
-                        if (userLocation != location)
-                        {
-
-                        }
+                        Console.WriteLine("Location is not found. TryAgain.");
+                        userLocation = Console.ReadLine();
+                        summary = db.Plants.Any(plant => plant.LocatedPlanted == userLocation);
                     }
+                    var location = db.Plants.Where(plant => plant.LocatedPlanted == userLocation);
+                    foreach (var plant in location)
+                    {
+                        Console.Write($"{plant.Species} is in {plant.LocatedPlanted}.\n");
+                    }
+                    Console.WriteLine("\nPress Enter to return to the main menu");
+                    view = Console.ReadLine();
+                    summary = false;
                 }
                 // view plants by plants that haven't been watered today
                 else if (view == "NOT")
                 {
                     Console.WriteLine("Here are the plants that have no been watered:");
-
+                    Console.Clear();
+                    Console.WriteLine("These are the plants that have not been watered today:");
+                    var viewWatered = db.Plants.Where(plant => plant.LastWateredDate < DateTime.Today);
+                    foreach (var plant in viewWatered)
+                    {
+                        Console.WriteLine($"{plant.Species} was watered on {plant.LastWateredDate}.");
+                    }
                     Console.WriteLine("Press Enter to return to the main menu");
                     view = Console.ReadLine();
                 }
@@ -92,12 +110,12 @@ namespace PartyThyme
             {
                 // displays plants by id, name, and location
                 var allPlants = db.Plants.OrderBy(plant => plant.LocatedPlanted);
-                    Console.WriteLine("\n***************************************");
+                Console.WriteLine("\n***************************************");
                     foreach (var plant in allPlants)
                     {
                         Console.WriteLine($"{plant.Species} is located in {plant.LocatedPlanted} ({plant.Id}).");
                     }
-                    Console.WriteLine("***************************************");
+                Console.WriteLine("***************************************");
                 Console.WriteLine("Please enter the ID # of the plant you'd like to remove?");
                 var remove = int.Parse(Console.ReadLine());
                 var plantToRemove = db.Plants.FirstOrDefault(plant => plant.Id == remove);
@@ -110,7 +128,29 @@ namespace PartyThyme
             // choose what plants need to be watered
             else if (main == "WATER")
             {
-                
+                Console.Clear();
+                var allWatered = db.Plants.OrderBy(plant => plant.LastWateredDate);
+                foreach (var watered in allWatered)
+                {
+                    Console.WriteLine($"ID:({watered.Id}) {watered.Species} was last watered on {watered.LastWateredDate}");
+                }
+                Console.WriteLine("Please choose the ID number of the plant you'd like to water.");
+                var userInput = int.Parse(Console.ReadLine());
+                var plantToWater = db.Plants.FirstOrDefault(plant => plant.Id == userInput);
+                if (plantToWater == null)
+                {
+                    Console.WriteLine("That is not a valid ID. Please choose a valid ID number.");
+                    userInput = int.Parse(Console.ReadLine());
+                }
+                if (plantToWater != null)
+                {
+                    plantToWater.LastWateredDate = DateTime.Now;
+                    db.SaveChanges();
+                }
+            }
+            if (main == "QUIT")
+            {
+                isRunning = false;
             }
             }
         }
