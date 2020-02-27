@@ -14,11 +14,12 @@ namespace PartyThyme
             while (isRunning)
             {
             Console.Clear();
-            Console.WriteLine("It's PARTY THYME!");
+            Console.WriteLine("         It's PARTY THYME!");
             Console.WriteLine("***************************************");
-            Console.WriteLine("What would you like to do?");
+            Console.WriteLine("     What would you like to do?");
             Console.WriteLine("----------------------------------------"); 
-            Console.WriteLine("(VIEW), (PLANT), (REMOVE), or (WATER)?\n Or would you like to (QUIT)?");
+            Console.WriteLine("(VIEW), (PLANT), (REMOVE), or (WATER)?");
+            Console.WriteLine("     Or would you like to (QUIT)?");
             Console.WriteLine("***************************************");
             var main = Console.ReadLine().ToUpper();
             if (main != "VIEW" && main != "PLANT" && main != "REMOVE" && main != "WATER")
@@ -40,7 +41,7 @@ namespace PartyThyme
                     Console.WriteLine("\n***************************************");
                     foreach (var plant in allPlants)
                     {
-                        Console.WriteLine($"{plant.Species} is located in {plant.LocatedPlanted} ({plant.Id}).");
+                        Console.WriteLine($"({plant.Id}): {plant.Species} is located in {plant.LocatedPlanted}.");
                     }
                     Console.WriteLine("***************************************");
                     Console.WriteLine("\n\nPress Enter to return to the main menu.");
@@ -54,21 +55,23 @@ namespace PartyThyme
                     {
                         Console.WriteLine($"{plant.LocatedPlanted}");
                     }
+                    Console.WriteLine("\n***************************************");
                     Console.WriteLine("What location would you like to view?");
                     var userLocation = Console.ReadLine();
                     var summary = db.Plants.Any(plant => plant.LocatedPlanted == userLocation);
-                    Console.WriteLine("\n***************************************");
                     while (!summary)
                     {
-                        Console.WriteLine("Location is not found. TryAgain.");
+                        Console.WriteLine("Location is not found. Try again.");
                         userLocation = Console.ReadLine();
                         summary = db.Plants.Any(plant => plant.LocatedPlanted == userLocation);
                     }
+                    Console.WriteLine("\n***************************************");
                     var location = db.Plants.Where(plant => plant.LocatedPlanted == userLocation);
                     foreach (var plant in location)
                     {
                         Console.Write($"{plant.Species} is in {plant.LocatedPlanted}.\n");
                     }
+                    Console.WriteLine("***************************************");
                     Console.WriteLine("\nPress Enter to return to the main menu");
                     view = Console.ReadLine();
                     summary = false;
@@ -91,6 +94,7 @@ namespace PartyThyme
             // add plants to the database
             else if (main == "PLANT")
             {
+                Console.WriteLine("\n***************************************");
                 Console.WriteLine($"What kind of species is it?");
                 newPlant.Species = Console.ReadLine();
                 Console.WriteLine($"Where was {newPlant.Species} planted?");
